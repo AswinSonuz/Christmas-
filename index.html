@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Merry Christmas 🎄 | AswinSonuzz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
+
+body{
+  background:radial-gradient(circle at top,#1b2735,#090a0f);
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+  text-align:center;
+}
+
+.snow{
+  position:fixed;
+  inset:0;
+  background:url("https://i.imgur.com/5Y6gGQv.png");
+  animation:snow 25s linear infinite;
+  opacity:.35;
+  pointer-events:none;
+}
+
+@keyframes snow{
+  to{background-position:0 1000px}
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+.card{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  border-radius:22px;
+  padding:35px 25px;
+  margin-bottom:30px;
+  box-shadow:0 0 40px rgba(255,255,255,.1);
+}
+
+h1{font-size:2.6rem}
+h1 span{color:#ff5252}
+
+button{
+  background:linear-gradient(135deg,#ff416c,#ff4b2b);
+  border:none;
+  padding:12px 28px;
+  border-radius:40px;
+  color:#fff;
+  cursor:pointer;
+  font-size:1rem;
+  margin:8px;
+  transition:.25s;
+}
+
+button:hover{transform:scale(1.07)}
+
+input{
+  padding:10px 15px;
+  border-radius:30px;
+  border:none;
+  outline:none;
+  margin-bottom:10px;
+}
+
+.game{
+  height:220px;
+  border:2px dashed rgba(255,255,255,.4);
+  border-radius:16px;
+  position:relative;
+  overflow:hidden;
+}
+
+.gift{
+  position:absolute;
+  font-size:2.2rem;
+  cursor:pointer;
+}
+
+footer{
+  opacity:.7;
+  margin-top:20px;
+  font-size:.9rem;
+}
+
+#confetti{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+<div class="snow"></div>
+<canvas id="confetti"></canvas>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="card">
+    <h1>Merry Christmas 🎄<br><span>from AswinSonuzz</span></h1>
+    <p>Not just wishes. An experience ✨</p>
+
+    <input id="name" placeholder="Enter your name 🎅">
+    <br>
+    <button onclick="wish()">Open Your Wish 🎁</button>
+    <p id="wishText"></p>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="card">
+    <h2>🎆 Countdown to New Year</h2>
+    <p id="countdown"></p>
+  </div>
+
+  <!-- GAME -->
+  <div class="card">
+    <h2>🎮 Catch the Gift</h2>
+    <p>Tap fast. Earn your Christmas rank.</p>
+    <div class="game" id="game"></div>
+    <p>Score: <span id="score">0</span></p>
+    <p>Your Rank: <b id="rank">—</b></p>
+  </div>
+
+  <button onclick="toggleMusic()">🔊 Music</button>
+
+  <footer>
+    Crafted with ❤️ by <b>AswinSonuzz</b> • Christmas 2025
+  </footer>
+
+</div>
+
+<audio id="music" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
+
+<script>
+/* WISH */
+const wishes=[
+"✨ Big joy is coming your way",
+"🎄 Peace suits you well",
+"❤️ Someone silently cares about you",
+"🌟 Your hard days are ending",
+"🎁 You deserve more than you think"
+];
+
+function wish(){
+ const name=document.getElementById("name").value||"Friend";
+ document.getElementById("wishText").innerText=
+ name+", "+wishes[Math.floor(Math.random()*wishes.length)];
+}
+
+/* COUNTDOWN */
+const target=new Date("Jan 1, 2026 00:00:00").getTime();
+setInterval(()=>{
+ const now=new Date().getTime();
+ const d=target-now;
+ const days=Math.floor(d/(1000*60*60*24));
+ const hrs=Math.floor((d%(1000*60*60*24))/(1000*60*60));
+ const mins=Math.floor((d%(1000*60*60))/(1000*60));
+ document.getElementById("countdown").innerText=
+ `${days}d ${hrs}h ${mins}m left`;
+},1000);
+
+/* GAME */
+let score=0;
+const game=document.getElementById("game");
+const scoreEl=document.getElementById("score");
+const rankEl=document.getElementById("rank");
+
+function rankCalc(s){
+ if(s<5)return "Snow Rookie ❄️";
+ if(s<10)return "Gift Hunter 🎁";
+ if(s<20)return "Christmas Pro 🎄";
+ confetti(); return "Legend Santa 🔥";
+}
+
+function spawn(){
+ game.innerHTML="";
+ const g=document.createElement("div");
+ g.className="gift";
+ g.innerText="🎁";
+ g.style.left=Math.random()*80+"%";
+ g.style.top=Math.random()*70+"%";
+ g.onclick=()=>{
+   score++;
+   scoreEl.innerText=score;
+   rankEl.innerText=rankCalc(score);
+   spawn();
+ };
+ game.appendChild(g);
+}
+spawn();
+
+/* MUSIC */
+let playing=false;
+const music=document.getElementById("music");
+function toggleMusic(){
+ playing?music.pause():music.play();
+ playing=!playing;
+}
+
+/* CONFETTI */
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;canvas.height=innerHeight;
+
+function confetti(){
+ canvas.style.display="block";
+ let pieces=200;
+ let arr=[...Array(pieces)].map(()=>({
+   x:Math.random()*canvas.width,
+   y:Math.random()*canvas.height,
+   r:Math.random()*6+4,
+   d:Math.random()*canvas.height
+ }));
+ let t=0;
+ function draw(){
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   arr.forEach(p=>{
+     ctx.beginPath();
+     ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+     ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
+     ctx.fill();
+   });
+   update();
+ }
+ function update(){
+   t+=0.01;
+   arr.forEach(p=>{
+     p.y+=Math.cos(p.d+t)+1;
+     if(p.y>canvas.height)p.y=0;
+   });
+ }
+ let anim=setInterval(draw,30);
+ setTimeout(()=>{clearInterval(anim);canvas.style.display="none"},3000);
+}
+</script>
+</body>
+</html>
